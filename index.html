@@ -1,0 +1,438 @@
+<!doctype html>
+<html class="snap-suspended">
+<head>
+    <meta name="viewport" content="initial-scale=1"/>
+    <meta name="color-scheme" content="dark"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:title" content="Jackson Golletz"/>
+    <meta property="og:url" content="https://golle.tz/"/>
+    <meta property="og:image" content="https://golle.tz/assets/icon.jpg"/>
+    <link rel="preload" href="/locales/fr.json" as="fetch" type="application/json" media="(scripting: enabled)"/>
+    <link rel="preload" href="/locales/de.json" as="fetch" type="application/json" media="(scripting: enabled)"/>
+    <link rel="stylesheet" href="/assets/style.css"/>
+    <link rel="stylesheet" href="/assets/index.css"/>
+    <link rel="stylesheet" href="/assets/transitions.css"/>
+    <link rel="stylesheet" href="/assets/language-picker.css"/>
+    <link rel="stylesheet" href="/assets/translation-icon.css"/>
+    <link rel="stylesheet" href="/assets/tiles.css"/>
+    <link rel="expect" blocking="render" href="#language-picker"/>
+    <link rel="expect" blocking="render" href="#projects"/>
+    <link rel="expect" blocking="render" href="#industry"/>
+    <script src="/assets/transitions.js"></script>
+    <script type="module" src="/components/language-picker.js"></script>
+    <!--
+        This seems to absolutely tank performance with even just one prerender, let alone all of
+        them. It's much worse than simply having another tab open, as the documentation describes.
+        It's a fans-spinning, battery-plummeting, all-cores-on-deck performance cliff.
+
+        There are clearly unresolved issues here, so it strikes me as better to wait. It's a good
+        idea in principle, though.
+        
+        The motivation, just to make it explicit, is to reduce skipped transitions by having the
+        article pages already loaded in the background. There are other ways to do this, but
+        SPA-lite solutions like body-swapping would prevent MPA page transitions from working in
+        the first place. This defeats the purpose of having the transitions at all--they're here
+        more as a technical showcase than an essential feature.
+        
+        There's possibly a case to be made for using PWA request interception to construct the
+        pages, but I don't think that would actually deliver the load time reduction needed. And
+        besides, that would necessitate the inclusion of PWA plumbing, solely to try to *save*
+        bytes over the wire, which would, at the very least, require profiling and A/Bing to
+        justify.
+    -->
+    <!-- <script type="speculationrules">
+        {
+            "prerender": [{
+                "source": "document",
+                "where": {
+                    "href_matches": [
+                        "/article.html"
+                    ]
+                },
+                "eagerness": "eager"
+            }]
+        }
+    </script> -->
+    <title>Jackson Golletz</title>
+</head>
+<body>
+    <svg class="filters" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <filter id="blur-1" y="-20%" height="140%"><feGaussianBlur in="SourceGraphic" stdDeviation="0 3" /></filter>
+        <filter id="blur-2" y="-20%" height="140%"><feGaussianBlur in="SourceGraphic" stdDeviation="0 6" /></filter>
+        <filter id="blur-3" y="-20%" height="140%"><feGaussianBlur in="SourceGraphic" stdDeviation="0 9" /></filter>
+        <filter id="blur-4" y="-20%" height="180%"><feGaussianBlur in="SourceGraphic" stdDeviation="0 13" /></filter>
+        <filter id="blur-5" y="-20%" height="200%"><feGaussianBlur in="SourceGraphic" stdDeviation="0 18" /></filter> 
+        <filter id="outline" x="-10%" y="-10%" width="120%" height="120%">
+            <feMorphology operator="dilate" radius="1.5" in="SourceAlpha" result="dilated"/>
+            <feFlood flood-color="white" result="outlineColor"/>
+            <feComposite in="outlineColor" in2="dilated" operator="in" result="outline"/>
+            <feMerge>
+                <feMergeNode in="outline"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </svg>
+    <language-picker id="language-picker">
+        <div class="noscript-picker">
+            <button aria-haspopup="menu" popovertarget="menu" aria-disabled="true" aria-labelledby="picker-button-label">
+                <div class="translation-icon noscript-crossed" aria-hidden="true">
+                    <div class="icon-wrapper">
+                        <div class="grapheme-latin"></div>
+                        <div class="grapheme-hiragana"></div>
+                    </div>
+                </div>
+            </button>
+            <div id="menu" role="dialog" aria-labelledby="picker-dialog-label" popover>
+                <div class="icon" aria-hidden="true"></div>
+                <span class="picker-status script" data-string="translations.refresh_page" tabIndex="0" autofocus>Please refresh the page to enable translations.</span>
+                <span class="picker-status noscript" data-string="translations.no_javascript" tabIndex="0" autofocus>Translations are unavailable when JavaScript is disabled.</span>
+            </div>
+            <div id="picker-button-label" aria-hidden="true" data-string="translations.language_picker_disabled">Language picker, disabled</div>
+            <div id="picker-dialog-label" aria-hidden="true" data-string="translations.language_picker">Language picker</div>
+        </div>
+    </language-picker>
+    <div id="container">
+        <section class="cover no-contain no-cva always-snap">
+            <header class="scroll-wrapper"></header>
+            <div class="content">
+                <h1 role="text" class="greeting">
+                    <div class="hi">
+                        <div data-string="home.greeting">Hi!</div>
+                        <div data-string="home.im">I&rsquo;m</div>
+                    </div>
+                    <div>Jackson.</div>
+                </h1>
+            </div>
+            <div class="scroll-wrapper forward">
+                <!--
+                Making these links aria-hidden and unfocusable is a conscious and deliberate
+                decision. If they're kept screen reader-visible, they interrupt the flow of the
+                document as it's being read out, since they appear in each section. However, since
+                all these links do is jump between sections, and screen reader users can already
+                tab down to the headings directly, AND tabbing to a heading scrolls to it
+                automatically, there's no loss of functionality if they're invisible; the visual
+                jump these links afford is purely for sighted users, and is useless otherwise.
+                -->
+                <a href="#about" class="scroll-pill" aria-hidden="true" focusable="false">
+                    <div class="text-reveal">
+                        <span class="gap-after" data-string="nav.about">About</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+        <section id="about" class="cover">
+            <div class="scroll-wrapper back">
+                <a href="#top" class="scroll-pill" aria-hidden="true" focusable="false">
+                    <div class="text-reveal">
+                        <span class="gap-after" data-string="nav.home">Home</span>
+                    </div>
+                </a>
+            </div>
+            <div class="content">
+                <div role="text" class="static-experience iam">
+                    <details>
+                        <summary data-string="about.im_a">I&rsquo;m a</summary>
+                        <div class="items-layout" role="text presentation">
+                            <div><span data-string="role.developer">developer</span>,</div>
+                            <div><span data-string="role.designer">designer</span>,</div>
+                            <div><span data-string="role.musician">musician</span>,</div>
+                            <div><span data-string="role.gamer">gamer</span>,</div>
+                            <div><span data-string="role.writer">writer</span>,</div>
+                            <div><span data-string="role.rambler">rambler</span>,</div>
+                            <div><span data-string="role.teacher">teacher</span>,</div>
+                            <div><span data-string="role.puzzler">puzzler</span>,</div>
+                            <div><span data-string="role.linguist">linguist</span>,</div>
+                            <div><span data-string="role.word_nerd">word nerd</span>,</div>
+                            <div><span data-string="role.font_guy">font guy</span>,</div>
+                            <div><span data-string="role.traveller">traveller</span>,</div>
+                            <div><span data-string="role.teutophone">teutophone</span>,</div>
+                            <div><span data-string="role.francophone">francophone</span>,</div>
+                            <div><span data-string="role.outdoorsman">outdoorsman</span>,</div>
+                            <div><span data-string="role.indoorsman">indoorsman</span>,</div>
+                            <div><span data-string="role.concertgoer">concertgoer</span>,</div>
+                            <div><span data-string="role.storyteller">storyteller</span>,</div>
+                            <div><span data-string="role.photographer">photographer</span>,</div>
+                            <div><span data-string="role.rave_parent">rave parent</span>,</div>
+                            <div><span data-string="role.normal_human">normal human</span>,</div>
+                            <div><span data-string="role.perfectionist">perfectionist</span>,</div>
+                            <div><span data-string="role.lifelong_learner">lifelong learner</span>,</div>
+                            <div data-string="about.list_conjunction">and</div>
+                        </div>
+                    </details>
+                    <span role="text" data-string="role.frontend_engineer">frontend engineer.</span>
+                </div>
+                <div class="scroll-experience iam">
+                    <div data-string="about.im_a">I&rsquo;m a</div>
+                    <div class="role-scroller">
+                        <div class="role-list" aria-hidden="true">
+                            <div><span data-string="role.developer">developer</span>.&nbsp;</div>
+                            <div><span data-string="role.designer">designer</span>.</div>
+                            <div><span data-string="role.musician">musician</span>.</div>
+                            <div><span data-string="role.gamer">gamer</span>.</div>
+                            <div><span data-string="role.writer">writer</span>.</div>
+                            <div><span data-string="role.rambler">rambler</span>.</div>
+                            <div><span data-string="role.teacher">teacher</span>.</div>
+                            <div><span data-string="role.puzzler">puzzler</span>.</div>
+                            <div><span data-string="role.linguist">linguist</span>.</div>
+                            <div><span data-string="role.word_nerd">word nerd</span>.</div>
+                            <div><span data-string="role.font_guy">font guy</span>.</div>
+                            <div><span data-string="role.traveller">traveller</span>.</div>
+                            <div><span data-string="role.teutophone">teutophone</span>.</div>
+                            <div><span data-string="role.francophone">francophone</span>.</div>
+                            <div><span data-string="role.outdoorsman">outdoorsman</span>.</div>
+                            <div><span data-string="role.indoorsman">indoorsman</span>.</div>
+                            <div><span data-string="role.concertgoer">concertgoer</span>.</div>
+                            <div class="speed-1"><span data-string="role.storyteller">storyteller</span>.</div>
+                            <div class="speed-1"><span data-string="role.photographer">photographer</span>.</div>
+                            <div class="speed-2"><span data-string="role.rave_parent">rave parent</span>.</div>
+                            <div class="speed-3"><span data-string="role.normal_human">normal human</span>.</div>
+                            <div class="speed-4"><span data-string="role.perfectionist">perfectionist</span>.</div>
+                            <div class="speed-5"><span data-string="role.lifelong_learner">lifelong learner</span>.</div>
+                            <div></div>
+                            <div data-string="role.frontend_engineer">frontend engineer.</div>
+                        </div>
+                        <div class="accessible-list">
+                            <div data-string="role.developer">developer</div>
+                            <div data-string="role.designer">designer</div>
+                            <div data-string="role.musician">musician</div>
+                            <div data-string="role.gamer">gamer</div>
+                            <div data-string="role.writer">writer</div>
+                            <div data-string="role.rambler">rambler</div>
+                            <div data-string="role.teacher">teacher</div>
+                            <div data-string="role.puzzler">puzzler</div>
+                            <div data-string="role.linguist">linguist</div>
+                            <div data-string="role.word_nerd">word nerd</div>
+                            <div data-string="role.font_guy">font guy</div>
+                            <div data-string="role.traveller">traveller</div>
+                            <div data-string="role.teutophone">teutophone</div>
+                            <div data-string="role.francophone">francophone</div>
+                            <div data-string="role.outdoorsman">outdoorsman</div>
+                            <div data-string="role.indoorsman">indoorsman</div>
+                            <div data-string="role.concertgoer">concertgoer</div>
+                            <div data-string="role.storyteller">storyteller</div>
+                            <div data-string="role.photographer">photographer</div>
+                            <div data-string="role.rave_parent">rave parent</div>
+                            <div data-string="role.normal_human">normal human</div>
+                            <div data-string="role.perfectionist">perfectionist</div>
+                            <div data-string="role.lifelong_learner">lifelong learner</div>
+                            <div data-string="role.frontend_engineer">frontend engineer.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="scroll-wrapper forward">
+                <a href="#history" class="scroll-pill" aria-hidden="true" focusable="false">
+                    <div class="text-reveal">
+                        <span class="gap-after" data-string="nav.history">History</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+        <section id="history" class="no-contain no-cva">
+            <div class="scroll-wrapper back">
+                <a href="#about" class="scroll-pill" aria-hidden="true" focusable="false">
+                    <div class="text-reveal">
+                        <span class="gap-after" data-string="nav.about">About</span>
+                    </div>
+                </a>
+            </div>
+            <div class="content two-wide">
+                <figure>
+                    <img src="assets/photo.jpg" alt="A man with long brown hair and a short-shorn beard. He is standing with others and smiling" data-alt-string="history.image_alt" aria-labelledby="image-label"></img>
+                    <figcaption data-string="history.image_caption">Me in late 2024</figcaption>
+                    <div id="image-label" data-string="history.image_alt" aria-hidden="true">A man with long brown hair and a short-shorn beard. He is standing with others and smiling</div>
+                </figure>
+                <article id="article">
+                    <h2 data-string="heading.history">History</h2>
+                    <p data-string="history.paragraph_1">
+                        I wrote my first line of HTML code when I was nine years old.
+                        Practically from that moment onward, I&rsquo;ve known web development is what I want to do with my life.
+                        I started volunteering as a web developer for local non-profits in 7th grade, and began my first paid internship as a sophomore in high school.
+                        I&rsquo;ve been carrying this incomparable passion with me for more than 15 years now, with no signs of slowing down.
+                    </p>
+                    <p data-string="history.paragraph_2">
+                        In 2021, I graduated <em>summa cum laude</em> from Oregon State University, earning my bachelor&rsquo;s degree in applied computer science.
+                        In the years since, I&rsquo;ve worked for scrappy start-ups, Fortune 500 companies, and everything in between&mdash;focusing mainly on UI/UX and accessibility.
+                    </p>
+                    <p data-string="history.paragraph_3">
+                        I&rsquo;m currently searching for my next role. If you have a web development problem that needs solving, I&rsquo;d love to chat!
+                        In the meantime, I&rsquo;ve been alternating between several different personal projects to keep my skills sharp.
+                        You can view some of them in the gallery below.
+                    </p>
+                    <div class="signature-block">
+                        <div class="closing" data-string="history.thanks">Thanks for stopping by!</div>
+                        <!--<figure class="sig-fig-hehe-remember-sig-figs-man-high-school-sure-was-a-while-ago-wasnt-it-fuck">-->
+                            <!--
+                                Specify both alt text and aria-describedby here because some screen
+                                readers (or at least VoiceOver, anyway) fail to use the correct
+                                language voice when reading alt text, but behave correctly if the
+                                label is a separate element referenced by ID. I'm keeping the alt
+                                text more for best practices compliance than anything, since it's
+                                overridden by aria-describedby in every scenario I can think of.
+                            -->
+                            <svg id="signature" width="130" height="158" viewBox="0 0 130 158" fill="none" stroke="currentColor" stroke-width="2px" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" alt="Cursive signature, Jackson" data-alt-string="history.signature_alt" aria-labelledby="signature-label">
+                                <g clip-path="url(#tapers)">
+                                    <path id="j" d="M21.255 78.8997C17.47 42.7929 39.825 4.02271 53.83 1.40443C53.83 1.40443 81.5825 -5.88866 54.14 62.405C28.1375 127.127 -0.815007 171.52 1.70999 146.313C3.7125 126.335 13.02 86.2178 47.315 55.5608C57.7475 46.2388 74 40.4856 93.0825 37.1977" pathLength="100"/>
+                                    <path id="ack" d="M70.2725 51.1168C62.6725 48.8095 56.365 60.8977 64.305 60.4087C67.8875 59.7215 68.63 58.1916 69.585 55.1119C70.045 54.1514 70.5325 49.6697 69.96 52.6165C69.3275 55.7289 69.27 56.5941 69.5575 59.7942C70.7425 62.7461 75.06 60.8977 75.52 58.1916C75.5575 57.9785 74.12 52.5463 80.78 52.456C74.4175 51.523 73.7575 61.778 78.6275 60.6469C87.32 60.1905 102.773 32.9292 110.018 16.7154L110.368 15.8802" pathLength="100"/>
+                                    <path id="son" d="M93.35 53.4617C93.35 53.4617 90.6875 53.8303 90.5775 55.2849C90.3775 57.9634 95.145 56.2981 101.767 54.9012C114.827 52.1425 108.365 59.3127 128.542 56.4361" pathLength="100"/>
+                                </g>
+                                <defs>
+                                    <clipPath id="tapers">
+                                        <path d="M 0,0 V 158 H 130 V 0 Z m 109.26758,13.851562 10.72851,0.376954 -5.57421,9.740234 -13.24805,12.443359 c 0,0 9.68311,-18.719217 8.09375,-22.560547 z m -14.888674,21.822266 0.451172,2.257813 -0.61914,0.248047 c 0,0 -4.127669,-1.33641 -16.167969,1.27539 l -4.876953,-2.167969 z m 35.578124,19.060547 0.0293,3.005859 c -3.601,-1.3268 -11.04688,-1.646484 -11.04688,-1.646484 l -2.35156,-1.082031 z" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                            <div id="signature-label" aria-hidden="true" data-string="history.signature_alt">Cursive signature, Jackson</div>
+                        <!--</figure>-->
+                    </div>
+                </article>
+            </div>
+            <div class="scroll-wrapper forward">
+                <a href="#projects" class="scroll-pill" aria-hidden="true" focusable="false">
+                    <div class="text-reveal">
+                        <span class="gap-after" data-string="nav.projects">Projects</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+        <section id="projects">
+            <div class="scroll-wrapper back">
+                <a href="#history" class="scroll-pill" aria-hidden="true" focusable="false">
+                    <div class="text-reveal">
+                        <span class="gap-after" data-string="nav.history">History</span>
+                    </div>
+                </a>
+            </div>
+            <div class="content">
+                <h2 data-string="heading.projects">Projects</h2>
+                <div class="section-list">
+                    <a href="/projects/portfolio" class="section-link portfolio">
+                        <div class="filled" aria-hidden="true">
+                            <div class="line-wrap">
+                                <div class="line">
+                                    <span data-string="home.greeting">Hi!</span>
+                                    <span data-string="home.im">I&rsquo;m</span>
+                                </div>
+                                <div class="line">Jackson.</div>
+                            </div>
+                        </div>
+                        <div class="outline" aria-hidden="true">
+                            <div class="line-wrap">
+                                <div class="line">
+                                    <span data-string="home.greeting">Hi!</span>
+                                    <span data-string="home.im">I&rsquo;m</span>
+                                </div>
+                                <div class="line">Jackson.</div>
+                            </div>
+                        </div>
+                        <div class="visually-hidden" data-string="projects.portfolio">Portfolio</div>
+                    </a>
+                    <a href="/projects/scorebug" class="section-link scorebug" lang="en">
+                        <div class="filled"></div>
+                        <div class="outline"></div>
+                        <div class="visually-hidden">Scorebug</div>
+                    </a>
+                    <a href="/projects/chatbot" class="section-link chatbot" lang="en">
+                        <div class="filled"></div>
+                        <div class="outline"></div>
+                        <div class="visually-hidden">Chatbot</div>
+                    </a>
+                    <a href="/projects/quest" class="section-link quest" lang="en">
+                        <div class="filled"></div>
+                        <div class="outline"></div>
+                        <div class="visually-hidden">Quest.fan</div>
+                    </a>
+                    <a href="/projects/los" class="section-link los" lang="en">
+                        <div class="filled"></div>
+                        <div class="outline"></div>
+                        <div class="visually-hidden">Los-token</div>
+                    </a>
+                </div>
+            </div>
+            <div class="scroll-wrapper forward">
+                <a href="#industry" class="scroll-pill" aria-hidden="true" focusable="false">
+                    <div class="text-reveal">
+                        <span class="gap-after" data-string="nav.industry">Industry</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+        <section id="industry">
+            <div class="scroll-wrapper back">
+                <a href="#projects" class="scroll-pill" aria-hidden="true" focusable="false">
+                    <div class="text-reveal">
+                        <span class="gap-after" data-string="nav.projects">Projects</span>
+                    </div>
+                </a>
+            </div>
+            <div class="content narrow">
+                <h2 data-string="heading.industry">Industry</h2>
+                <div class="section-list">
+                    <a href="/industry/ebay" class="section-link ebay" lang="en">
+                        <div class="filled"></div>
+                        <div class="outline"></div>
+                        <div class="visually-hidden">eBay</div>
+                    </a>
+                    <a href="/industry/heal" class="section-link heal" lang="en">
+                        <div class="filled"></div>
+                        <div class="outline"></div>
+                        <div class="visually-hidden">Heal</div>
+                    </a>
+                    <a href="#contact" class="section-link you">
+                        <div class="filled"></div>
+                        <div class="outline"></div>
+                        <div class="visually-hidden" data-string="industry.you">You?</div>
+                    </a>
+                </div>
+            </div>
+            <div class="scroll-wrapper forward">
+                <a href="#contact" class="scroll-pill" aria-hidden="true" focusable="false">
+                    <div class="text-reveal">
+                        <span class="gap-after" data-string="nav.contact">Contact</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+        <section id="contact">
+            <div class="scroll-wrapper back">
+                <a href="#industry" class="scroll-pill" aria-hidden="true" focusable="false">
+                    <div class="text-reveal">
+                        <span class="gap-after" data-string="nav.industry">Industry</span>
+                    </div>
+                </a>
+            </div>
+            <div class="content narrow">
+                <h2 data-string="heading.contact">Contact</h2>
+                <!--The best way to contact me is-->
+                <p data-string="contact.paragraph_1">
+                    Do you have a job opening, coding problem, or a personal project that could use an extra pair of eyes? 
+                    Feel free to reach out!
+                    I&rsquo;m also interested in opportunities for technical writing, DevRel, and conference speaking (English only, for now), if that&rsquo;s something you&rsquo;re looking for.
+                </p>
+                <p data-string="contact.paragraph_2">
+                    Currently, the best way to get in touch with me is via LinkedIn.
+                    I welcome cold contacts and connection requests, but a short message about why you're reaching out is always appreciated.
+                </p>
+                <!--yeeeeaaaaaaaaaaaaaaaa-->
+                <div class="contact-block">
+                    <span data-string="contact.message_here">You can message me here:</span>
+                    <div class="contact-list">
+                        <a href="https://www.linkedin.com/in/jacksongolletz/" aria-labelledby="linkedin-label">
+                            <img class="linkedin-logo" src="/assets/linkedin.svg" aria-hidden="true"></img>
+                            JacksonGolletz
+                        </a>
+                    </div>
+                    <div id="linkedin-label" class="visually-hidden" aria-hidden="true" data-string="contact.linkedin_label">LinkedIn profile, Jackson Golletz</div>
+                </div>
+            </div>
+            <footer class="scroll-wrapper" aria-hidden="true">
+                <div>&#x2764;&#xFE0E;, Jackson</div>
+            </footer>
+        </section>
+    </div>
+    <script src="/assets/buttons.js"></script>
+    <script src="/assets/triggers.js"></script>
+    <script src="/assets/snapping.js"></script>
+    <script src="/assets/language.js"></script>
+</body>
+</html>

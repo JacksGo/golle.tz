@@ -1,0 +1,138 @@
+@media (prefers-reduced-motion: no-preference) {
+    @view-transition {
+        navigation: auto;
+    }
+}
+
+html::view-transition-old(projects-content), html::view-transition-old(industry-content) {
+    animation-name: exit-to-left;
+    animation-duration: 1s;
+}
+html::view-transition-new(projects-content), html::view-transition-new(industry-content) {
+    animation-name: enter-from-right;
+    animation-duration: 1s;
+    animation-delay: 0.25s;
+}
+
+html::view-transition-old(article-content) {
+    animation-name: exit-with-fade;
+    animation-duration: 1s;
+}
+html::view-transition-new(article-content) {
+    animation-name: enter-with-fade;
+    animation-duration: 1s;
+    animation-delay: 0.25s;
+}
+
+&::view-transition-old(projects-top), &::view-transition-old(industry-top) {
+    animation-name: exit-to-top;
+    animation-timing-function: linear;
+}
+&::view-transition-new(projects-top), &::view-transition-new(industry-top) {
+    animation-name: enter-from-top;
+    animation-delay: 1s;
+    animation-duration: 1s;
+    animation-timing-function: ease-out;
+}
+
+&::view-transition-old(projects-bottom), &::view-transition-old(industry-bottom) {
+    animation-name: exit-to-bottom;
+    animation-timing-function: linear;
+}
+&::view-transition-new(projects-bottom), &::view-transition-new(industry-bottom) {
+    animation-name: enter-from-bottom;
+    animation-delay: 1s;
+    animation-duration: 1s;
+    animation-timing-function: ease-out;
+}
+
+&::view-transition-old(article-top) {
+    animation-name: exit-to-top;
+    animation-timing-function: linear;
+}
+&::view-transition-new(article-top) {
+    animation-name: enter-from-top;
+    animation-delay: 1s;
+    animation-duration: 1s;
+    animation-timing-function: ease-out;
+}
+
+html:active-view-transition-type(forwards, backwards) {
+	:root {
+		view-transition-name: none;
+    }
+}
+
+html:active-view-transition-type(forwards) {
+	&::view-transition-old(projects-content) { animation-name: exit-to-left; }
+	&::view-transition-new(projects-content) { animation-name: enter-from-right; }
+    &::view-transition-old(industry-content) { animation-name: exit-to-left; }
+	&::view-transition-new(industry-content) { animation-name: enter-from-right; }
+
+    &::view-transition-old(article-content) { animation-name: exit-with-fade; }
+	&::view-transition-new(article-content) { animation-name: enter-with-fade; }
+}
+
+html:active-view-transition-type(backwards) {
+	&::view-transition-old(projects-content) { animation-name: exit-to-right; }
+	&::view-transition-new(projects-content) { animation-name: enter-from-left; }
+	&::view-transition-old(industry-content) { animation-name: exit-to-right; }
+	&::view-transition-new(industry-content) { animation-name: enter-from-left; }
+
+    &::view-transition-old(article-content) { animation-name: exit-with-fade; }
+	&::view-transition-new(article-content) { animation-name: enter-with-fade; }
+}
+
+/**
+ *  Keyframes! Git yer keyframes!
+ */
+
+@keyframes enter-from-left {
+	from { translate: -100vw 0; }
+}
+
+@keyframes enter-from-right {
+	from { translate: 100vw 0; }
+}
+
+@keyframes exit-to-left {
+	to { translate: -100vw 0; }
+}
+
+@keyframes exit-to-right {
+	to { translate: 100vw 0; }
+}
+
+@keyframes enter-with-fade {
+	from { opacity: 0; }
+}
+
+@keyframes exit-with-fade {
+	to { opacity: 0; }
+}
+
+/**
+ * In vertical animations, using 100%, not 100vw is deliberate, since the elements
+ * being animated are the .scroll-wrappers, and they only need to move just out of
+ * (or into) the viewport.
+ */
+
+@keyframes enter-from-bottom {
+	from { translate: 0 calc(100% + 2em); }
+}
+
+@keyframes enter-from-top {
+	from { translate: 0 calc(-100% + -2em); }
+}
+
+@keyframes exit-to-bottom {
+	to { translate: 0 calc(100% + 2em); }
+}
+
+@keyframes exit-to-top {
+	to { translate: 0 calc(-100% - 2em); }
+}
+
+::view-transition-group(*) {
+	animation-duration: 0.5s;
+}

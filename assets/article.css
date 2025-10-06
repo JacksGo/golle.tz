@@ -1,0 +1,168 @@
+.scroll-wrapper.start { view-transition-name: article-top; }
+
+/* body.from-projects #article {
+    view-transition-name: projects-content;
+}
+
+body.from-industry #article {
+    view-transition-name: industry-content;
+} */
+
+section {
+    grid-template-rows: var(--button-basis) 1fr;
+}
+
+#article {
+    view-transition-name: article-content;
+    
+    width: min(800px, 100%);
+    justify-content: start;
+}
+
+article p {
+    width: min(calc(800px - 2em), calc(100% - 2em));
+
+    &:first-of-type {
+        margin-block-start: 0;
+    }
+
+    &:not(:last-child) {
+        margin-block-end: 1lh;
+    }
+
+    a {
+        color: white !important;
+    }
+}
+
+/**
+ * Prevent the view transition from snapshotting a partially complete reveal animation.
+ * Consider animating the element directly instead of a snapshot in the future.
+ */
+#back-button:active, #back-button:focus {
+    color: black !important;
+    transition: none;
+    
+    .text-reveal {
+        transition: none;
+        width: auto;
+    }
+
+    &::before {
+        background-image: none;
+        background: white;
+    }
+}
+
+h1 {
+    font-weight: normal;
+    font-size: 1.5em;
+    margin: 0 0 1.5rem 0;
+}
+
+.scroll-wrapper.start {
+    position: sticky;
+    top: 1em;
+    left: 0;
+    z-index: 1;
+}
+
+.warning-wrapper {
+    display: none;
+    interpolate-size: allow-keywords;
+
+    max-width: calc(100% - 2em);
+    box-sizing: border-box;
+    overflow: hidden;
+    
+    height: auto;
+    margin-block-end: 2em;
+
+    @supports (interpolate-size: allow-keywords) {
+        transition: height 0.5s ease-in-out, margin-block-end 0.5s ease-in-out;
+    }
+
+    html:active-view-transition & {
+        transition: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
+
+    @starting-style {
+        height: 0px;
+        margin-block-end: 0px;
+    }
+}
+
+#translation-warning {
+    display: flex;
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    position: relative;
+
+    /* margin-block-end: 2em; */
+
+    place-self: center;
+    flex-direction: row;
+    gap: 0.5em;
+
+    background: var(--background-color);
+    color: var(--border-color);
+    border-color: var(--border-color);
+    
+    border-width: 2px;
+    border-style: solid;
+
+    padding: 1em;
+    padding-inline: 1.5em;
+    border-radius: 1em;
+
+    --warning-color: #eed202;
+    --border-color: var(--warning-color);
+    --background-color: color-mix(in hsl, var(--warning-color), black 80%);
+}
+
+#translation-warning #warning-dismiss {
+    appearance: none;
+    background: transparent;
+    border: none;
+    margin: 0;
+    width: 1lh;
+    height: 1lh;
+    padding: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5em;
+    cursor: pointer;
+    
+    position: relative;
+    inset-block-start: -0.5em;
+    inset-inline-end: -1em;
+
+    &:hover {
+        background: color-mix(in hsl, var(--warning-color), black 70%);
+    }
+
+    &::before {
+        content: '×' / '';
+        pointer-events: none;
+        font-size: 150%;
+        color: var(--warning-color);
+        text-box-trim: trim-both;
+        text-box-edge: cap alphabetic;
+    }
+}
+
+html[data-translated='true']:is(:lang(de), :lang(fr)) .warning-wrapper:not(:has(#warning-dismiss:checked)) {
+    display: block;
+}
+
+.warning-description {
+    font-size: 95%;
+    margin-inline-start: 1em;
+    place-content: center;
+}

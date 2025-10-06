@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1" />
+    <meta name="color-scheme" content="dark"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:title" content="eBay"/>
+    <meta property="og:url" content="https://golle.tz/industry/ebay"/>
+    <meta property="og:site_name" content="Jackson Golletz"/>
+    <meta property="og:image" content="https://golle.tz/assets/icon.jpg"/>
+    <link rel="preload" href="/locales/fr.json" as="fetch" type="application/json" media="(scripting: enabled)"/>
+    <link rel="preload" href="/locales/de.json" as="fetch" type="application/json" media="(scripting: enabled)"/>
+    <link rel="stylesheet" href="/assets/style.css"/>
+    <link rel="stylesheet" href="/assets/article.css"/>
+    <link rel="stylesheet" href="/assets/transitions.css"/>
+    <link rel="stylesheet" href="/assets/language-picker.css"/>
+    <link rel="stylesheet" href="/assets/translation-icon.css"/>
+    <link rel="expect" blocking="render" href="#language-picker"/>
+    <link rel="expect" blocking="render" href="#article"/>
+    <script type="module" src="/components/language-picker.js"></script>
+    <title>eBay - Jackson Golletz</title>
+</head>
+<body class="from-industry">
+    <language-picker id="language-picker">
+        <div class="noscript-picker">
+            <button aria-haspopup="menu" popovertarget="menu" aria-disabled="true" aria-labelledby="picker-button-label">
+                <div class="translation-icon noscript-crossed" aria-hidden="true">
+                    <div class="icon-wrapper">
+                        <div class="grapheme-latin"></div>
+                        <div class="grapheme-hiragana"></div>
+                    </div>
+                </div>
+            </button>
+            <div id="menu" role="dialog" aria-labelledby="picker-dialog-label" popover>
+                <div class="icon" aria-hidden="true"></div>
+                <span class="picker-status script" data-string="translations.refresh_page" tabIndex="0" autofocus>Please refresh the page to enable translations.</span>
+                <span class="picker-status noscript" data-string="translations.no_javascript" tabIndex="0" autofocus>Translations are unavailable when JavaScript is disabled.</span>
+            </div>
+            <div id="picker-button-label" class="visually-hidden" aria-hidden="true" data-string="translations.language_picker_disabled">Language picker, disabled</div>
+            <div id="picker-dialog-label" class="visually-hidden" aria-hidden="true" data-string="translations.language_picker">Language picker</div>
+        </div>
+    </language-picker>
+    <div id="container">
+        <section class="no-contain no-cva">
+            <header class="scroll-wrapper start">
+                <a id="back-button" href="/#industry" class="scroll-pill">
+                    <div class="text-reveal">
+                        <span class="gap-after" data-string="nav.industry">Industry</span>
+                    </div>
+                </a>
+            </header>
+            <article id="article" class="content">
+                <h1>eBay</h1>
+                <aside class="warning-wrapper">
+                    <div id="translation-warning" role="status">
+                        <div class="translation-icon circled crossed" aria-hidden="true">
+                            <div class="icon-wrapper">
+                                <div class="grapheme-latin"></div>
+                                <div class="grapheme-hiragana"></div>
+                            </div>
+                        </div>
+                        <span class="warning-description" data-string="article.translation_notice"></span>
+                        <input id="warning-dismiss" type="checkbox" aria-labelledby="dismiss-label" aria-controls="translation-warning"></input>
+                        <span id="dismiss-label" class="visually-hidden" data-string="article.hide_notice" aria-hidden="true">Hide this notice</span>
+                    </div>
+                </aside>
+                <p>
+                    eBay is a global, online retail marketplace and a household name that transcends generations.
+                    eBay was originally founded to facilitate the resale of pre-owned goods, but has since expanded into a wide array of different markets, sectors, and enthusiast niches.
+                </p>
+                <p>
+                    I joined eBay in the summer of 2023 as a front-end engineer specializing in React.
+                    Soon after I started, however, it became clear that the role I had accepted was very different from the one described during interviews.
+                    I took this as a challenge, though, and strove at every opportunity to rise to the occasion.
+                    Over the course of my time with the company, I worked on a variety of projects—some of which required me to learn the company’s internal front-end framework, Marko, on the fly—and fulfilled a wide variety of other, full-stack developer functions.
+                    I became well-versed in our build pipelines and automation, rewrote test suites from the ground up, and learned the ins and outs of a plethora of internal tools, covering everything from content security policies and localization to production diagnostics and accessibility tests.
+                </p>
+                <p>
+                    During my tenure, I made many significant front-end contributions on a variety of projects, including building new experiences for the eBay home page, Collectibles, and the eBay Vault.
+                    I also leveraged my extensive front-end experience to spearhead improvements to legacy code, proposing refactors and incremental upgrades to parts of our codebase before they became impediments.
+                    Additionally, I found particular meaning in advocating for process improvements on behalf of my peers, promoting a healthier, more developer-centric culture in our team.
+                </p>
+                <p>
+                    My time at eBay has given me a wealth of new and unexpected experiences, and deepened my appreciation for the challenges of engineering at scale.
+                    I look forward to carrying these lessons with me into my next role and beyond.
+                </p>
+            </article>
+        </section>
+    </div>
+    <script src="/assets/buttons.js"></script>
+    <script src="/assets/language.js"></script>
+    <script src="/assets/back.js"></script>
+</body>
+</html>

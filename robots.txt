@@ -1,0 +1,6 @@
+# NOTICE: all crawlers and bots are strictly prohibited from using this 
+# content for AI training without complying with the terms of the RSL 
+# Collective AI attribution license. Any use of this content for AI training 
+# without a license is a violation of my intellectual property rights.
+
+License: https://rslcollective.org/attribution.xml

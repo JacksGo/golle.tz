@@ -1,0 +1,316 @@
+@property --mask-offset {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+html {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+
+    scrollbar-color: white black;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+
+    @media (prefers-reduced-motion: no-preference) {
+        scroll-behavior: smooth;
+    }
+}
+
+body {
+    margin: 0;
+    width: 100%;
+    min-height: 100%;
+
+    background: black;
+    /* background: gray; */
+    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.no-contain { contain: unset; }
+.no-cva { content-visibility: unset; }
+
+#container {
+    display: flex;
+    flex-direction: column;
+
+    width: min(100%, var(--viewport-max));
+    margin: 0 auto;
+
+    --card-width: 350px;
+    --aspect-ratio: calc((1 + sqrt(5)) / 2);
+    --viewport-max: calc((var(--card-width) * 3) + 2em + 2em);
+}
+
+section {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-rows: var(--button-basis) 1fr var(--button-basis);
+    gap: 2em;
+    justify-items: center;
+
+    padding: 1em;
+    box-sizing: border-box;
+
+    height: auto;
+    min-height: 100lvh; /* Changed from dvh to prevent Safari from losing the plot */
+
+    --button-basis: calc(2em + 1lh);
+    --chevron-width: 1em;
+
+    /* This breaks scroll snapping? Completely? */
+    /* overflow-x: hidden; */
+
+    contain: paint layout style;
+    content-visibility: auto;
+
+    .content {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        max-width: calc(100vw - 2em);
+
+        grid-row: 2 / 3;
+    }
+
+    .scroll-wrapper {
+        display: flex;
+        justify-content: center;
+        justify-self: stretch;
+        height: var(--button-basis);
+
+        content-visibility: auto;
+
+        &.back {
+            grid-row: 1 / 2;
+            
+            margin-block-start: -1em;
+            padding-block-start: 1em;
+
+            scroll-snap-align: start;
+            scroll-snap-stop: normal;
+        }
+
+        &.start {
+            grid-row: 1 / 2;
+        }
+
+        &.forward {
+            grid-row: 3 / 4;
+
+            margin-block-end: -1em;
+            padding-block-end: 1em;
+
+            html:not(.snap-suspended):not(:active-view-transition) &, .always-snap & {
+                scroll-snap-align: end;
+                scroll-snap-stop: normal;
+            }
+
+            @media not (scripting: enabled) {
+                html.snap-suspended & {
+                    scroll-snap-align: end;
+                    scroll-snap-stop: normal;
+                }
+            }
+        }
+        
+        header& {
+            content-visibility: visible;
+
+            .always-snap & {
+                scroll-snap-align: start;
+                scroll-snap-stop: normal;
+            }
+        }
+
+        footer& {
+            align-items: center;
+            justify-content: flex-end;
+            flex-direction: column;
+            gap: 0.25lh;
+            
+            color: color-mix(in srgb, white, black 20%);
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+
+        .scroll-pill {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            padding: 1em;
+            box-sizing: border-box;
+            height: var(--button-basis);
+            min-width: var(--button-basis);
+            border: 2px solid white;
+            border-radius: 9999px;
+            color: var(--text-color);
+            transition: color 0.5s ease-in-out;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+
+            html.debug & {
+                background: radial-gradient(red, red 2px, black 2px, black);
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                &, .text-reveal, &:before {
+                    transition-timing-function: step-start !important;
+                }
+
+                &, &:before {
+                    transition-delay: 0s !important;
+                }
+            }
+
+            text-box-edge: ex alphabetic;
+            text-box-trim: trim-both;
+
+            --text-color: white;
+
+            .text-reveal {
+                display: flex;
+                justify-content: end;
+                interpolate-size: allow-keywords;
+                width: 0;
+                transition: width 0.5s ease-in-out;
+                transition-delay: 0s;
+
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: clip;
+                pointer-events: none;
+
+                /* mix-blend-mode: exclusion; */
+
+                .gap-after {
+                    margin-inline-end: 1.5em;
+                }
+            }
+
+            &::before {
+                content: '';
+                width: 300%;
+                height: 100%;
+                position: absolute;
+                right: 0%;
+                transition: right 0.5s ease-in-out;
+                /* background-image: linear-gradient(45deg, white, white calc((100% + 10%) / 3), transparent calc((100% - 10%) / (3 / 2)), transparent); */
+                background-image: linear-gradient(45deg, white, white calc((100% + 10%) / 3), rgb(0 0 0 / 50%) calc((100% - 10%) / (3 / 2)), rgb(0 0 0 / 50%));
+                z-index: -1;
+            }
+
+            &:hover::before {
+                right: -200%;
+            }
+
+            &:hover {
+                --text-color: black;
+
+                .text-reveal {
+                    transition-delay: 0s !important;
+                }
+            }
+
+            .scroll-wrapper:hover & {
+                .text-reveal {
+                    width: auto;
+                }
+
+                &:not(:hover) {
+                    .text-reveal {
+                        transition-delay: 225ms;
+                    }
+                }
+            }
+
+            &::after {
+                content: "";
+                pointer-events: none;
+
+                border-left: 2px solid currentColor;
+                border-top: 2px solid currentColor;
+
+                transform-origin: center;
+                transform: rotate(45deg) translate(calc((25% - 1px) / sqrt(2)), calc((25% - 1px) / sqrt(2)));
+
+                width: calc(var(--chevron-width) / sqrt(2));
+                aspect-ratio: 1;
+            }
+
+            .scroll-wrapper.forward &::after {
+                rotate: 180deg;
+            }
+
+            .scroll-wrapper.start &::after {
+                rotate: -90deg;
+            }
+        }
+    }
+
+    h2 {
+        margin: 0 0 1em 0;
+        font-weight: normal;
+    }
+}
+
+article p {
+    margin-inline: 2em;
+    width: calc(100% - 4em);
+    display: block;
+    text-align: start;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+
+    &:not(:last-child) {
+        margin-block-end: 1.5lh;
+    }
+}
+
+p {
+    text-indent: 2em;
+    line-height: 1.35;
+}
+
+.visually-hidden {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0px;
+    height: 0px;
+    overflow: hidden;
+    clip-path: rect(0 0 0 0);
+}
+
+@media print {
+    body, html, :root {
+        background: white;
+        color: black;
+        scrollbar-width: none;
+    }
+
+    .scroll-wrapper {
+        visibility: hidden;
+    }
+
+    footer.scroll-wrapper {
+        visibility: visible;
+    }
+
+    section, figure {
+        page-break-after: always;
+    }
+}

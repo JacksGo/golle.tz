@@ -1,0 +1,315 @@
+@property --tape-offset-frame-2 {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --tape-offset-frame-3 {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --tape-offset-frame-4 {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+.section-link .outline, .section-link .filled {
+    background-size: contain;
+    background-origin: padding-box;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.section-link.portfolio {
+    user-select: none;
+
+    .outline, .filled {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+    }
+
+    .outline {
+        .line {
+            color: black !important;
+            /**
+             * Visually, using an feMorphology filter isn't optimal. It uses the vector data in the
+             * font and then explodes the points, which leads to blobbiness and distortion in the
+             * outline. Since -webkit-text-stroke is a) not cross-browser and b) draws the outline
+             * inside of the glyphs, this is the best way I can think of to get an outline whose
+             * underlying text can be updated whenever the page language changes, regardless of
+             * browser. There's *maybe* an argument to be made for creating separate SVGs for each
+             * language and swapping them out, but... no.
+             */
+            filter: url(#outline);
+        }
+    }
+
+    .filled {
+        border: 2px solid white !important;
+        border-radius: 1rem;
+
+        .line {
+            color: white !important;
+        }
+    }
+
+    .line-wrap {
+        display: flex;
+        flex-direction: column;
+        font-size: 40px;
+        font-weight: bold;
+    }
+
+    .line {
+        display: inline-block;
+        white-space: nowrap;
+        margin-inline: 0.25ch;
+    }
+}
+
+.section-link.scorebug {
+    /* background-size: 130% 130%; */
+
+    .outline {
+        background-image: url('/assets/tiles/scorebug.svg');
+    }
+    .filled {
+        position: relative;
+        background-image: url('/assets/tiles/scorebug_filled.svg');
+    }
+
+    /**
+     * Fix to an issue where backgrounds (potentially with background-origin: border-box?) don't
+     * blur quite all the way to the edge in the corners.
+     */
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -15%;
+        background: url('/assets/tiles/scorebug_bg.jpg');
+        background-position: center;
+        background-size: cover;
+        filter: blur(2px);
+    }
+}
+
+.section-link.chatbot {
+    background: white;
+
+    .outline {
+        background-image: url('/assets/tiles/chatbot.svg');
+    }
+    .filled {
+        background-image: url('/assets/tiles/chatbot_filled.svg');
+        inset-block-start: 0%;
+        inset-block-end: unset;
+        height: 100%;
+
+        transition: inset-block-start 0s 0.5s step-start;
+
+        &::before {
+            content: '';
+            display: block;
+            background: white;
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            position: absolute;
+            inset-block-start: -2px;
+            inset-inline-start: -2px;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        &::after {
+            content: '';
+            display: block;
+            /* background: white; */
+            width: calc(100% + 4px);
+            height: calc(4 * (100% + 4px));
+            position: absolute;
+            inset-block-start: calc(100% + 2px);
+            inset-inline-start: -2px;
+            pointer-events: none;
+            background-image: url('/assets/tiles/chatbot_1.svg'), url('/assets/tiles/chatbot_2.svg'), url('/assets/tiles/chatbot_3.svg'), url('/assets/tiles/chatbot_4.svg');
+            background-position: center 0%, center calc(100% / 3), center calc(200% / 3), center 100%;
+            background-size: 100% 25%, 100% 25%, 100% 25%, 100% 25%;
+            background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+            /* mix-blend-mode: multiply; */
+        }
+    }
+
+    &:is(:hover, :focus) .filled {
+        inset-block-start: -400%;
+        transition: inset-block-start 12s 0.5s cubic-bezier(.1,0,.9,1);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .filled, &:is(:hover, :focus) .filled {
+            transition: none;
+            inset-block-start: 0;
+        }
+
+        .filled::after {
+            opacity: 0;
+            inset-block-start: calc((-100% - 4px) * (
+                var(--tape-offset-frame-2) +
+                var(--tape-offset-frame-3) +
+                var(--tape-offset-frame-4)
+            ));
+
+            /* What if you do something like... */
+            /*
+                opacity: calc(
+                    max(var(--tape-opacity-out-2), var(--tape-opacity-in-2)) *
+                    max(var(--tape-opacity-out-3), var(--tape-opacity-in-3)) *
+                    max(var(--tape-opacity-out-4), var(--tape-opacity-in-4))
+                );
+            */
+            /* Good god. It's hideous. I love it. */
+            /*
+                --*-out starts at 1 and transitions to 0.
+                --*-in starts at 0 and transitions to 1.
+
+                max() ensures we only yield 0 after --*-out has finished transitioning
+                and before --*-in has started transitioning. Multiplication ensures that
+                any zeros cascade.
+            */
+
+            transition:
+                opacity 0s 0.5s step-end,
+                --tape-offset-frame-2 0s 0.5s step-end,
+                --tape-offset-frame-3 0s 0.5s step-end,
+                --tape-offset-frame-4 0s 0.5s step-end;
+            
+            --tape-offset-frame-2: 0;
+            --tape-offset-frame-3: 0;
+            --tape-offset-frame-4: 0;
+        }
+
+        .filled::before {
+            transition: opacity 0s 0.5s step-start;
+        }
+
+        &:is(:hover, :focus) .filled::before {
+            opacity: 1;
+            transition: opacity 0.5s 0.5s ease-in-out;
+        }
+
+        /**
+         * Slight annoyance: because the position of the frame tape is set by an animation,
+         * as soon as the user unhovers the card, the tape disappears (since by default, it's
+         * positioned off screen and then moved up by the animation). This MIGHT be fixable with
+         * custom property transitions and precise delays
+         * (e.g., inset-block-start: calc(var(--offs-1) + var(--offs-2) + ...) and transitioning
+         * each one from zero to calc(100% + 4px) in series.
+         *
+         * Update: I fix!
+         */
+        &:is(:hover, :focus) .filled::after {
+            opacity: 1;
+            transition:
+                opacity 0.5s 1s ease-in-out,
+                --tape-offset-frame-2 calc(7s / 3) 0.5s step-end,
+                --tape-offset-frame-3 calc(7s / (3 / 2)) 0.5s step-end,
+                --tape-offset-frame-4 7s 0.5s step-end;
+            
+            /* This doesn't work right. Needs its own set of transitions, I think. */
+            /* animation: chatbot-reduced-fade 7s 0.75s linear backwards; */
+            
+            --tape-offset-frame-2: 1;
+            --tape-offset-frame-3: 1;
+            --tape-offset-frame-4: 1;
+        }
+    }
+}
+
+@keyframes chatbot-reduced-change {
+    0% { inset-block-start: 0; }
+    33.333% { inset-block-start: calc(-100% - 4px); }
+    66.666% { inset-block-start: calc(-200% - 8px); }
+    100% { inset-block-start: calc(-300% - 12px); }
+}
+
+@keyframes chatbot-reduced-fade {
+    0% { opacity: 0; }
+    3.571%, 26.190% { opacity: 1; }
+    29.762% { opacity: 0; }
+    33.333%, 59.524% { opacity: 1; }
+    63.095% { opacity: 0; }
+    66.666%, 92.858% { opacity: 1; }
+    96.429% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.section-link.quest {
+    background: white;
+
+    .outline {
+        background-image: url('/assets/tiles/quest.svg');
+    }
+    .filled {
+        background-image: url('/assets/tiles/quest_filled.svg');
+    }
+}
+
+.section-link.los {
+    background-image: url('/assets/tiles/los_bg.png');
+    background-size: cover;
+
+    .outline {
+        background-image: url('/assets/tiles/los.svg');
+    }
+    .filled {
+        background-image: url('/assets/tiles/los_filled.svg');
+        mix-blend-mode: multiply; /** @todo temp */
+    }
+}
+
+.section-link.ebay {
+    background: white;
+
+    .outline {
+        background-image: url('/assets/tiles/ebay.svg');
+    }
+    .filled {
+        background-image: url('/assets/tiles/ebay_filled.svg');
+    }
+}
+
+.section-link.heal {
+    background: white;
+
+    .outline {
+        background-image: url('/assets/tiles/heal.svg');
+    }
+    .filled {
+        background-image: url('/assets/tiles/heal_filled.svg');
+    }
+}
+
+.section-link.you {
+    background: white;
+
+    .outline {
+        background-image: url('/assets/tiles/you.svg');
+    }
+    .filled {
+        background-image: url('/assets/tiles/you_filled.svg');
+    }
+}
+
+@media print {
+    .section-link .outline {
+        display: none !important;
+    }
+
+    .section-link .filled {
+        border: 2px solid black !important;
+        border-radius: 1em;
+    }
+}

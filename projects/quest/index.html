@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1"/>
+    <meta name="color-scheme" content="dark"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:title" content="Quest.fan"/>
+    <meta property="og:url" content="https://golle.tz/projects/quest"/>
+    <meta property="og:site_name" content="Jackson Golletz"/>
+    <meta property="og:image" content="https://golle.tz/assets/icon.jpg"/>
+    <link rel="preload" href="/locales/fr.json" as="fetch" type="application/json" media="(scripting: enabled)"/>
+    <link rel="preload" href="/locales/de.json" as="fetch" type="application/json" media="(scripting: enabled)"/>
+    <link rel="stylesheet" href="/assets/style.css"/>
+    <link rel="stylesheet" href="/assets/article.css"/>
+    <link rel="stylesheet" href="/assets/transitions.css"/>
+    <link rel="stylesheet" href="/assets/language-picker.css"/>
+    <link rel="stylesheet" href="/assets/translation-icon.css"/>
+    <link rel="expect" blocking="render" href="#language-picker"/>
+    <link rel="expect" blocking="render" href="#article"/>
+    <script type="module" src="/components/language-picker.js"></script>
+    <title>Quest.fan - Jackson Golletz</title>
+</head>
+<body class="from-projects">
+    <language-picker id="language-picker">
+        <div class="noscript-picker">
+            <button aria-haspopup="menu" popovertarget="menu" aria-disabled="true" aria-labelledby="picker-button-label">
+                <div class="translation-icon noscript-crossed" aria-hidden="true">
+                    <div class="icon-wrapper">
+                        <div class="grapheme-latin"></div>
+                        <div class="grapheme-hiragana"></div>
+                    </div>
+                </div>
+            </button>
+            <div id="menu" role="dialog" aria-labelledby="picker-dialog-label" popover>
+                <div class="icon" aria-hidden="true"></div>
+                <span class="picker-status script" data-string="translations.refresh_page" tabIndex="0" autofocus>Please refresh the page to enable translations.</span>
+                <span class="picker-status noscript" data-string="translations.no_javascript" tabIndex="0" autofocus>Translations are unavailable when JavaScript is disabled.</span>
+            </div>
+            <div id="picker-button-label" class="visually-hidden" aria-hidden="true" data-string="translations.language_picker_disabled">Language picker, disabled</div>
+            <div id="picker-dialog-label" class="visually-hidden" aria-hidden="true" data-string="translations.language_picker">Language picker</div>
+        </div>
+    </language-picker>
+    <div id="container">
+        <section class="no-contain no-cva">
+            <header class="scroll-wrapper start">
+                <a id="back-button" href="/#projects" class="scroll-pill">
+                    <div class="text-reveal">
+                        <span class="gap-after" data-string="nav.projects">Projects</span>
+                    </div>
+                </a>
+            </header>
+            <article id="article" class="content">
+                <h1>Quest.fan</h1>
+                <aside class="warning-wrapper">
+                    <div id="translation-warning" role="status">
+                        <div class="translation-icon circled crossed" aria-hidden="true">
+                            <div class="icon-wrapper">
+                                <div class="grapheme-latin"></div>
+                                <div class="grapheme-hiragana"></div>
+                            </div>
+                        </div>
+                        <span class="warning-description" data-string="article.translation_notice"></span>
+                        <input id="warning-dismiss" type="checkbox" aria-labelledby="dismiss-label" aria-controls="translation-warning"></input>
+                        <span id="dismiss-label" class="visually-hidden" data-string="article.hide_notice" aria-hidden="true">Hide this notice</span>
+                    </div>
+                </aside>
+                <p>
+                    Quest.fan is a web application, written in React, which allows players of the tabletop role-playing game Quest to easily create, manage, and share their characters’ information with the other players in their group.
+                </p>
+                <p>
+                    The project was born out of necessity in the early days of the pandemic, at a time when meeting in person and physically sharing character sheets was neither safe nor practical.
+                    I created the first iteration of the site in just over a week using React’s Context API for state management, then later rewrote it from scratch using Redux Toolkit as a learning exercise.
+                    In the months following the initial release, I worked diligently to add new features and address issues as they were brought to my attention.
+                </p>
+                <p>
+                    From the outset, I knew that to minimize the friction of switching to a digital system, I wanted the site to function as similarly as possible to the physical game.
+                    I researched the company’s branding, created numerous mockups, and brainstormed ways to preserve the familiarity of Quest while eliminating pain points that were present in the pen-and-paper game.
+                </p>
+                <p>
+                    I also invested heavily in improving accessibility in the transition from physical to digital.
+                    In addition to conducting ad hoc, informal user testing, I extensively tested the website using multiple screen readers and referenced the WAI-ARIA standard throughout the development process.
+                </p>
+                <p>
+                    You can check out the project <a href="https://quest.fan/">by clicking here</a>.
+                </p>
+            </article>
+        </section>
+    </div>
+    <script src="/assets/buttons.js"></script>
+    <script src="/assets/language.js"></script>
+    <script src="/assets/back.js"></script>
+</body>
+</html>

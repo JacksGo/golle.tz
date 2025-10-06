@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1"/>
+    <meta name="color-scheme" content="dark"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:title" content="Portfolio"/>
+    <meta property="og:url" content="https://golle.tz/projects/portfolio"/>
+    <meta property="og:site_name" content="Jackson Golletz"/>
+    <meta property="og:image" content="https://golle.tz/assets/icon.jpg"/>
+    <link rel="preload" href="/locales/fr.json" as="fetch" type="application/json" media="(scripting: enabled)"/>
+    <link rel="preload" href="/locales/de.json" as="fetch" type="application/json" media="(scripting: enabled)"/>
+    <link rel="stylesheet" href="/assets/style.css"/>
+    <link rel="stylesheet" href="/assets/article.css"/>
+    <link rel="stylesheet" href="/assets/transitions.css"/>
+    <link rel="stylesheet" href="/assets/language-picker.css"/>
+    <link rel="stylesheet" href="/assets/translation-icon.css"/>
+    <link rel="expect" blocking="render" href="#language-picker"/>
+    <link rel="expect" blocking="render" href="#article"/>
+    <script type="module" src="/components/language-picker.js"></script>
+    <title>Portfolio - Jackson Golletz</title>
+</head>
+<body class="from-projects">
+    <language-picker id="language-picker">
+        <div class="noscript-picker">
+            <button aria-haspopup="menu" popovertarget="menu" aria-disabled="true" aria-labelledby="picker-button-label">
+                <div class="translation-icon noscript-crossed" aria-hidden="true">
+                    <div class="icon-wrapper">
+                        <div class="grapheme-latin"></div>
+                        <div class="grapheme-hiragana"></div>
+                    </div>
+                </div>
+            </button>
+            <div id="menu" role="dialog" aria-labelledby="picker-dialog-label" popover>
+                <div class="icon" aria-hidden="true"></div>
+                <span class="picker-status script" data-string="translations.refresh_page" tabIndex="0" autofocus>Please refresh the page to enable translations.</span>
+                <span class="picker-status noscript" data-string="translations.no_javascript" tabIndex="0" autofocus>Translations are unavailable when JavaScript is disabled.</span>
+            </div>
+            <div id="picker-button-label" class="visually-hidden" aria-hidden="true" data-string="translations.language_picker_disabled">Language picker, disabled</div>
+            <div id="picker-dialog-label" class="visually-hidden" aria-hidden="true" data-string="translations.language_picker">Language picker</div>
+        </div>
+    </language-picker>
+    <div id="container">
+        <section class="no-contain no-cva">
+            <header class="scroll-wrapper start">
+                <a id="back-button" href="/#projects" class="scroll-pill">
+                    <div class="text-reveal">
+                        <span class="gap-after" data-string="nav.projects">Projects</span>
+                    </div>
+                </a>
+            </header>
+            <article id="article" class="content">
+                <h1 data-string="projects.portfolio">Portfolio</h1>
+                <aside class="warning-wrapper">
+                    <div id="translation-warning" role="status">
+                        <div class="translation-icon circled crossed" aria-hidden="true">
+                            <div class="icon-wrapper">
+                                <div class="grapheme-latin"></div>
+                                <div class="grapheme-hiragana"></div>
+                            </div>
+                        </div>
+                        <span class="warning-description" data-string="article.translation_notice"></span>
+                        <input id="warning-dismiss" type="checkbox" aria-labelledby="dismiss-label" aria-controls="translation-warning"></input>
+                        <span id="dismiss-label" class="visually-hidden" data-string="article.hide_notice" aria-hidden="true">Hide this notice</span>
+                    </div>
+                </aside>
+                <p>
+                    A write-up detailing the making of my portfolio website is coming soon.
+                    In the meantime, feel free to have a look through the code!
+                    Surely there&rsquo;s something of interest somewhere...
+                </p>
+            </article>
+        </section>
+    </div>
+    <script src="/assets/buttons.js"></script>
+    <script src="/assets/language.js"></script>
+    <script src="/assets/back.js"></script>
+</body>
+</html>

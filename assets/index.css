@@ -1,0 +1,810 @@
+@keyframes list-scroll {
+    0.0000000% { transform: translateY(0lh); }
+    7.8847916% { transform: translateY(-1lh); }
+    15.753946% { transform: translateY(-2lh); }
+    23.592716% { transform: translateY(-3lh); }
+    31.377121% { transform: translateY(-4lh); }
+    39.070565% { transform: translateY(-5lh); }
+    46.620290% { transform: translateY(-6lh); }
+    53.954296% { transform: translateY(-7lh); }
+    60.979825% { transform: translateY(-8lh); }
+    67.584972% { transform: translateY(-9lh); }
+    73.645279% { transform: translateY(-10lh); }
+    79.036875% { transform: translateY(-11lh); }
+    83.656262% { transform: translateY(-12lh); }
+    87.444002% { transform: translateY(-13lh); }
+    90.405706% { transform: translateY(-14lh); }
+    92.621027% { transform: translateY(-15lh); }
+    94.232810% { transform: translateY(-16lh); }
+    95.416178% { transform: translateY(-17lh); }
+    96.338482% { transform: translateY(-18lh); }
+    97.127664% { transform: translateY(-19lh); animation-timing-function: cubic-bezier(.68,0,.64,1); }
+    97.861668% { transform: translateY(-20lh); animation-timing-function: cubic-bezier(.6,0,.7,1); }
+    98.577679% { transform: translateY(-21.2lh); animation-timing-function: cubic-bezier(.47,0,.76,1); }
+    99.289240% { transform: translateY(-22.7lh); animation-timing-function: cubic-bezier(.47,0,.76,1); }
+    100.00000% { transform: translateY(-23.7lh); animation-timing-function: cubic-bezier(.34,0,.82,1); }
+}
+
+@keyframes final-scroll {
+    0% { transform: translateY(-23.7lh); }
+    100% { transform: translateY(-24.7lh); }
+}
+
+/**
+ * Signature animation
+ *
+ * Yes, I did all of this by hand. I took a signature SVG I already had on hand, then broke apart
+ * each path into its individual segments, computed each node's position on the path as a
+ * percentage of the total length, then recorded a video of myself signing a blank piece of paper
+ * and played it back frame-by-frame to calculate the exact amount of time it took for me to cross
+ * each would-be node position. Finally, I converted those percentages and times back into offset
+ * positions and keyframed them, using the recorded time from the video to set the duration of the
+ * animation.
+ *
+ * You should see the Excel spreadsheet.
+ */
+
+@keyframes j-anim {
+    0% { stroke-dashoffset: 100; }
+    50% { stroke-dashoffset: 79.2360648; }
+    60.417% { stroke-dashoffset: 62.6693316; }
+    73.333% { stroke-dashoffset: 36.0870531; }
+    83.333% { stroke-dashoffset: 11.7255163; }
+    100% { stroke-dashoffset: 0; }
+}
+
+@keyframes ack-anim {
+    0% { stroke-dashoffset: 100; }
+    23.457% { stroke-dashoffset: 85.272; }
+    32.099% { stroke-dashoffset: 75.202; }
+    35.802% { stroke-dashoffset: 74.175; }
+    41.975% { stroke-dashoffset: 69.442; }
+    48.148% { stroke-dashoffset: 62.980; }
+    58.025%, 61.728% { stroke-dashoffset: 55.635; }
+    87.654% { stroke-dashoffset: 44.682; }
+    98.765% { stroke-dashoffset: 0.725 }
+    100% { stroke-dashoffset: 0; }
+}
+
+@keyframes son-anim {
+    0% { stroke-dashoffset: 100; }
+    28.986% { stroke-dashoffset: 91.775; }
+    48.309% { stroke-dashoffset: 63.347; }
+    100% { stroke-dashoffset: 0; }
+}
+
+html {
+    scroll-snap-type: y mandatory;
+
+    /**
+     * Fundamental compromise time!
+     *
+     * I would like it if we could scroll smoothly to the hash on initial load, but when scroll
+     * snap points are enabled, the browser's automatic scrolling (when set to smooth) gets stuck
+     * on the snap points in between the top of the page and the target. As a result, when a user
+     * loads a fresh session with a hash already in the URL, the browser scrolls, but to the wrong
+     * section. I initially wanted to suspend snapping itself until we reach the target in this
+     * case, but because we're doing the "has reached" logic as a progressive enhancement inside of
+     * a scrollsnapchanged handler, disabling the snap points means we'll never re-enable snap
+     * points because there *are* no snap points to trigger the event.
+     * 
+     * The other solution I thought of was to move the snap-suspended logic into a dedicated
+     * IntersectionObserver, but this is undesirable because IntersectionObservers are relatively
+     * expensive, computationally.
+     * 
+     * As far as I can tell, that leaves one course of action-- prevent the browser from getting
+     * stuck on the snap points by preventing it from smooth scrolling on initial load. This isn't
+     * exactly what I had envisioned originally, but it works. I'm keeping the class name as
+     * .snap-suspended because that's what I named it originally and it's more reflective of the
+     * problem being solved, if not the strategy employed to do it.
+     * 
+     * Update: I also added back the snap suspension to more definitively prevent early snapping on
+     * reload. So I guess the class name was right after all :)
+     */
+    @media (scripting: enabled) {
+        &.snap-suspended {
+            scroll-snap-type: none;
+            scroll-behavior: auto;
+        }
+    }
+
+    &:active-view-transition {
+        scroll-behavior: auto;
+        scroll-snap-type: none;
+    }
+
+    @media not (scripting: enabled) {
+        &.snap-suspended {
+            scroll-snap-type: y proximity;
+        }
+    }
+
+    /**
+     * Failsafe for extremely short screens to ensure that we don't prevent the user from
+     * seeing all of the cards.
+     */
+    @media screen and (height <= calc((3 * 350px / ((1 + sqrt(5)) / 2)) + 2em)) {
+        & {
+            scroll-snap-type: y proximity !important;
+        }
+    }
+}
+
+.filters {
+    clip-path: rect(0 0 0 0);
+    position: absolute;
+    top: -100%;
+    left: -100%;
+}
+
+#container h1 {
+    margin: 0;
+}
+
+main, section {
+    .content {
+        &.narrow {
+            width: min(100%, calc((var(--card-width) * 2) + 2em + 2em));
+
+            p {
+                align-self: flex-start;
+                text-align: start;
+            }
+        }
+
+        &.two-wide {
+            display: flex;
+            /*flex-wrap: wrap;*/
+            flex-direction: row;
+            align-items: flex-start;
+            column-gap: 2em; /* condenses progressively from 2em to 0.8em at small sizes (see media query below) */
+            row-gap: 2em;
+
+            width: 100%;
+            max-width: 100%;
+
+            figure {
+                height: calc(100lvh - (2 * var(--button-basis)) - 4em - 2em - 1.5lh);
+                aspect-ratio: calc(1 / var(--aspect-ratio));
+                margin: 0;
+                margin-block-end: 1.5lh;
+                
+                position: sticky;
+                /* top: 1em; */
+                top: calc(2em + 1em + var(--button-basis));
+                left: 1em;
+
+                max-width: calc(100vw - 2em);
+                min-height: min(var(--max-height), calc(var(--card-width) * var(--aspect-ratio)));
+
+                /* When on small screens, especially mobile layouts, we want a more selective
+                 * min-height which refuses to push the figure half of the section part 1dvh. This
+                 * is how we get there.
+                 */
+                /*                 viewprt  pad   nav button        nav gap   caption     pad */
+                /*                 v        v     v                       v   v     v     v   */
+                --max-height: calc(100lvh - 1em - var(--button-basis) - 2em - 1em - 1lh - 1em);
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    object-position: center;
+                    border-radius: 1em;
+                    border: none;
+                }
+
+                figcaption {
+                    text-align: center;
+                    margin-block-start: 0.5lh;
+                }
+
+                #image-label {
+                    position: absolute;
+                    inset: 1lh 0% 0% 0%;
+                    clip-path: rect(0 0 0 0);
+                }
+            }
+
+            article {
+                align-self: start;
+                flex: 1 1 50%;
+                min-width: 0;
+                min-height: calc(100lvh - (2 * var(--button-basis)) - 4em - 2em - 1.5lh);
+
+                h2 {
+                    text-align: center;
+                    margin-block-start: 0;
+                    text-box-edge: text alphabetic;
+                    text-box-trim: trim-both;
+                }
+
+                .signature-block {
+                    box-sizing: border-box;
+                    max-width: calc(45% - 2em);
+                    margin-inline-start: 55%;
+                    margin-inline-end: 2em;
+                    position: relative;
+
+                    display: inline-flex;
+                    flex-direction: column;
+                    text-align: end;
+
+                    /** To allow the condensed layout to ignore the J's loop **/
+                    margin-block-end: -20%;
+
+                    :where(#signature) {
+                        margin-block-start: 1em;
+                        transform: rotate(-5deg);
+                        align-self: end;
+                    }
+                    
+                    .closing {
+                        white-space: nowrap;
+                        align-self: end;
+
+                        /**
+                         * Site no longer overflows when viewed on a fucking Tamogatchi.
+                         * Vielen Dank für Ihren 🅱️...
+                         */
+                        max-width: calc(50vw - 1em - 2em - 1em - 2em - 2em);
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                        margin-inline-start: 2em;
+                    }
+
+                    /**
+                     * If JavaScript is disabled, the signature animation will never trigger,
+                     * so we prevent it from being hidden in the first place.
+                     */
+                    @media screen and (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+                        #signature path {
+                            stroke-dasharray: 102 102;
+                            stroke-dashoffset: 102;
+                            animation: none;
+                            animation-delay: 0;
+                        }
+                    }
+
+                    #signature.drawing path#j {
+                        animation: j-anim var(--signature-j-duration) ease-out forwards;
+                        animation-delay: var(--signature-initial-delay);
+                    }
+
+                    #signature.drawing path#ack {
+                        animation: ack-anim var(--signature-ack-duration) ease-out forwards;
+                        animation-delay: calc(var(--signature-initial-delay) + var(--signature-j-duration) + var(--signature-ack-delay));
+                    }
+
+                    #signature.drawing path#son {
+                        animation: son-anim 287ms ease-out forwards;
+                        animation-delay: calc(var(--signature-initial-delay) + var(--signature-j-duration) + var(--signature-ack-delay) + var(--signature-ack-duration) + var(--signature-son-delay));
+                    }
+
+                    #signature-label {
+                        position: absolute;
+                        inset: 1lh 0% 0% 0%;
+                        clip-path: rect(0 0 0 0);
+                    }
+
+                    --signature-initial-delay: 500ms;
+                    --signature-j-duration: 550ms;
+                    --signature-ack-delay: 150ms;
+                    --signature-ack-duration: 600ms;
+                    --signature-son-delay: 130ms;
+                    --signature-son-duration: 287ms;
+                }
+            }
+            /**
+             * Lord, deliver me from whatever the fuck this shit is.
+             * 
+             * Media queries can't use variables, so we're inlining everything. Basically, this
+             * says: if the viewport width is too small to fit two of the .two-wide figures
+             * side-by-side, then:
+             *
+             *   - Add a snap point to the article.
+             *   - Increase the size of the article so that from the top of the article
+             *     to the bottom of the section button is 100dvh.
+             *   - Cap the width of the article to what its width would be if the document
+             *     weren't width-constrained (the max width of `main`, minus the figure width,
+             *     padding, and flex gaps).
+             *
+             * The query looks like the the scrawlings of a man whom CSS has finally driven insane,
+             * because they are! Honestly, though, it's actually not bad once you internalize the
+             * structure of each page. Is it flexible in the face of variable changes? No! But
+             * that's an unavoidable limitation of CSS as it exists today.
+             *
+             * One thing that might be worth noting here is the commented-out portion on the end.
+             * The 2em is the margin-inline-start of the paragraph (hence pmis), and the 0.25em is
+             * an approximation of the minimum gap size between the figure and the article when we
+             * get down to minimum width. Since that's calculated dynamically, there's no way to
+             * get it exact without inlining more variables, which, for something so small is not
+             * remotely worth it. I commented these out because including them sets the cutoff at
+             * exactly the point when the article is the same width as the figure. This is just
+             * barely over the width of a window snapped to half of a 16:9 screen, after
+             * subtracting browser chrome. It doesn't look that bad for the article to be slightly
+             * less than half the width, and if that allows us to keep the two-wide layout when
+             * the user has snapped the window, I think it's worth doing.
+             */
+
+            /*                                     viewpt   pad   button-basis  gap   gap   button-basis  pad    aspect-ratio           pad   pad     pmis  gap   */
+            @media screen and (width <= calc(2 * ((100lvh - 1em - (2em + 1lh) - 2em - 2em - (2em + 1lh) - 1em) / ((1 + sqrt(5)) / 2)) + 1em + 1em /*+ 2em + 0.25em*/)) {
+                flex-direction: column;
+
+                article {
+                    scroll-snap-align: start;
+                    scroll-snap-stop: normal;
+                    min-height: calc(100svh - var(--button-basis) - 2em - 1em); /* Changed from dvh for Safari reasons */
+                    max-width: var(--ideal-article-width);
+                }
+
+                figure, article {
+                    align-self: center;
+
+                    position: relative;
+                    top: 0;
+                    left: 0;
+                }
+
+                h2 {
+                    margin-block-start: 1em !important;
+                    margin-block-end: 1em !important;
+                }
+
+                p {
+                    margin-inline: auto !important;
+                    width: 100% !important;
+                }
+
+                p:not(:last-child) {
+                    margin-block-end: 1.5lh !important;
+                }
+
+                /**
+                 * Hot take: futzing with specificity is stupid.
+                 * But here I went and did it, so...
+                 */
+                div.signature-block {
+                    margin-block-end: 0%;
+                    
+                    div.closing {
+                        max-width: calc(100vw - 1em - 1em);
+                    }
+                }
+
+                #signature {
+                    margin-block-start: 1em !important;
+                }
+
+                --presumed-figure-width: ((100lvh - 1em - var(--button-basis) - 2em - 2em - var(--button-basis) - 1em) / var(--aspect-ratio));
+                --ideal-viewport-width: var(--viewport-max);
+                
+                /* --ideal-article-width: calc(var(--ideal-viewport-width) - var(--presumed-figure-width) - 2em - 2em); */
+                --ideal-article-width: calc(var(--presumed-figure-width)); /** An additional - 4em would account for the margin but I've removed those. */
+            }
+
+            /**
+             * As touched on briefly above when mentioning the gap size, this is a supplemental
+             * media query that dynamically shrinks key margins around the figure and article
+             * in order to buy us *just enough* lateral space to use the two-wide layout when
+             * the browser window is snapped to half of the screen.
+             *
+             * I'm kind of doing a "space-shuttle code" thing for the media query, just so it's
+             * more clear exactly what I'm reflecting. As soon as we get under the "narrow"
+             * content width (3 card widths plus the space between them), it's shronkin time.
+             */
+            @media screen and (width <= calc(350px + 2em + 350px + 2em + 350px)) {
+                column-gap: calc(0.8em + (1.2em * var(--ratio)));
+
+                & article p:not(:last-child) {
+                    margin-block-end: calc(1lh * (1.5 - ((1 - var(--ratio)) * 0.45)));
+                }
+
+                & article h2 {
+                    margin-block-end: calc(1em * (1 - ((1 - var(--ratio)) * 0.5)));
+                }
+
+                & article #signature {
+                    margin-block-start: calc(1em - (0.5em * (1 - var(--ratio))));
+                }
+
+                --min: calc((2 * ((100lvh - 4em - 2lh) / ((1 + sqrt(5)) / 2))) - 2em - 5px);
+                --max: calc((350px * 3) + 2em + 2em);
+                --ratio: calc((100svw - (var(--min))) / ((var(--max)) - (var(--min))));
+            }
+        }
+    }
+
+    .gallery {
+        justify-content: center;
+        margin-bottom: 1em;
+    }
+
+    .section-list {
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1em;
+
+        .section-link {
+            display: block;
+            width: min(calc(100% - 2em), var(--card-width));
+            aspect-ratio: var(--aspect-ratio);
+            position: relative;
+            overflow: hidden;
+            border-radius: 1em;
+            container: card / inline-size;
+
+            --phi-term: calc(1 / (var(--aspect-ratio) + 1));
+
+            .visually-hidden {
+                position: absolute;
+                inset: 0;
+                border-radius: 1em;
+                clip-path: rect(0 0 0 0);
+            }
+
+            & .filled {
+                position: absolute;
+                inset: 0;
+
+                border: 2px solid transparent;
+                box-sizing: border-box;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            & .outline {
+                position: absolute;
+                inset: 0;
+                box-sizing: border-box;
+                z-index: 1;
+
+                background-color: black;
+                border: 2px solid white;
+                border-radius: 1em;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                pointer-events: none;
+                transition: --mask-offset 0.5s ease-in-out;
+
+                @media (prefers-reduced-motion: reduce) {
+                    transition: opacity 0.5s ease-in-out;
+                }
+
+                /**
+                 * The calculation below creates the following, where each rectangular segment is
+                 * 100cqi:
+                 *
+                 * ┌───────┬╲───╲──┬───────┐
+                 * │       │ ╲   ╲ │       │
+                 * └───────┴──╲───╲┴───────┘
+                 *
+                 * To explain why this is, first, imagine a square. Suppose we wanted to fill the
+                 * square with two different colors, each in equal measure, using a line which
+                 * forms a 45-degree angle with the base. This is, of course, trivial: draw a line
+                 * between two opposing corners and fill the resulting right triangles on either
+                 * side.
+                 *
+                 * ┌╲──┐
+                 * │ ╲ │
+                 * └──╲┘
+                 *
+                 * Now, take this square and start dragging the sides outwards, elongating it into
+                 * a rectangle. If you force the triangles to remain right triangles, and keep each
+                 * of them pushed up against the corner they started in, a gap will start to form
+                 * between the diagonals of the two triangles as the width increases,
+                 *
+                 * ┌╲───╲──┐
+                 * │ ╲   ╲ │
+                 * └──╲───╲┘
+                 *
+                 * Great! Now, in the space between the two triangles, interpolate smoothly between
+                 * their respective colors. Ta-da! We've just created a rectangular gradient where
+                 * all of the "non-square" area in the center blends between the solid colors on
+                 * either side. Additionally, because the width of our blending region is
+                 * determined entirely by the width of the rectangle, the locations of the gradient
+                 * stops can be expressed mathematically as a function of the aspect ratio. Neat!
+                 * 
+                 * Altogether, the gradient below has, from right to left, one white rectangle,
+                 * then the rectangle from above (fading from white to black), and then a black
+                 * rectangle. Since the full gradient is 300% the width of the enclosing element,
+                 * the rectangle will normally appear completely white. However, when the user
+                 * hovers over the element, we scroll the gradient across so that the black
+                 * rectangle shows, instead.
+                 *
+                 * Now, rather than using this gradient as a background image, let's instead use it
+                 * as a luminance mask. This means that the white areas of the gradient will be
+                 * fully opaque, the black areas completely transparent, and the grays all
+                 * somewhere in between. We can use this to create a "cover" over our element that
+                 * will wipe away when we hover it, revealing the content underneath.
+                 * 
+                 * Pretty swanky, huh?
+                 */
+                mask-image: linear-gradient(45deg, black calc(100% / 3), black calc((100% / 3) + ((100% / 3) * var(--phi-term))), white calc((100% / 3) + (((100% / 3) * var(--aspect-ratio)) * var(--phi-term))), white calc(200% / 3));
+                
+                mask-size: 300cqi 100%;
+                mask-position: calc(-200cqi + var(--mask-offset)) 0;
+                mask-repeat: no-repeat;
+                mask-mode: luminance;
+
+                --mask-offset: 0cqi;
+            }
+
+            &:hover .outline, &:focus .outline {
+                --mask-offset: 200cqi;
+
+                @media (prefers-reduced-motion: reduce) {
+                    --mask-offset: 0cqi;
+                    opacity: 0;
+                }
+            }
+        }
+    }
+}
+
+.greeting {
+    display: block;
+    font-size: clamp(64px, 20vmin, 128px);
+    overflow-wrap: anywhere;
+    max-width: 100%;
+
+    .hi {
+        display: block;
+        
+        & > div {
+            display: inline-block;
+        }
+    }
+}
+
+.iam {
+    display: grid;
+    grid-auto-rows: auto;
+    grid-auto-flow: row;
+    font-size: clamp(44px, 10.4vw, 108px);
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 100%;
+    font-weight: 700;
+
+    &.static-experience { display: none; }
+    &.scroll-experience { display: block; }
+
+    /**
+     * If the user wants reduced motion, or the user has disabled JavaScript so the
+     * animation will never trigger, switch to a static, details-based version of
+     * the about section.
+     */
+    @media (prefers-reduced-motion: reduce) or (not (scripting: enabled)) {
+        &.static-experience { display: block; }
+        &.scroll-experience { display: none; }
+    }
+
+    &.static-experience {
+        max-width: 100%;
+        overflow: hidden;
+
+        /**
+         * Because the "I'm a" always takes as much space as it's given due to the
+         * margin-inline-start: auto on the ::after, and the .items-layout can
+         * break anywhere between items, but prefers to take up as much space as
+         * it can, using min-content here sizes the entire container to the width
+         * of whatever the "frontend engineer." text is. Beautiful.
+         */
+        width: min-content;
+
+        details {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr auto;
+        }
+
+        summary {
+            display: grid;
+            grid-row: 1;
+            grid-column: 1 / 3;
+            grid-template-columns: subgrid;
+
+            &::after {
+                content: '+' / '';
+                margin-inline-start: auto;
+                padding-inline-start: 0.5em;
+            }
+        }
+
+        details[open] summary::after {
+            content: '-' / '';
+        }
+
+        .items-layout {
+            font-size: 1.7rem;
+            line-height: 2;
+            font-weight: normal;
+            white-space: normal;
+            text-wrap: wrap balance;
+            
+            & > div {
+                display: inline-block;
+            }
+        }
+    }
+
+    .role-scroller {
+        width: fit-content;
+        height: 1lh;
+        overflow-y: hidden;
+        overflow-x: hidden;
+        /* Firefox doesn't like this */
+        /* overflow-y: clip;
+        overflow-clip-margin: 24px; */
+        contain: layout;
+        position: relative;
+
+        .accessible-list {
+            width: 0px;
+            height: 0px;
+            overflow: hidden;
+            clip-path: rect(0 0 0 0);
+
+            div {
+                position: absolute;
+                inset: 0;
+                clip-path: rect(0 0 0 0);
+            }
+        }
+
+        .role-list {
+            display: grid;
+            grid-auto-flow: row;
+
+            will-change: transform;
+            contain: layout style paint;
+            /* content-visibility: auto; */
+
+            & div:nth-child(n + 10) {
+                interpolate-size: allow-keywords;
+                width: 0;
+                min-height: 1lh;
+                overflow: hidden;
+                overflow: clip;
+                overflow-clip-margin: 24px;
+                white-space: nowrap;
+
+                contain: paint;
+                will-change: width;
+                
+                /**
+                 * If the browser doesn't support animating to auto, don't shrink the items
+                 * in the first place.
+                 */
+                @supports not (interpolate-size: allow-keywords) {
+                    width: auto;
+                }
+
+                /**
+                 * Likewise for users prefering reduced motion; start the container at the
+                 * full width. We'll give them controls to step through the list manually.
+                 */
+                @media (prefers-reduced-motion: reduce) {
+                    width: auto;
+                }
+            }
+
+            &.scrolling {
+                animation: list-scroll var(--dur) 1s cubic-bezier(.77,0,.58,1),
+                    final-scroll .5s calc(var(--dur) + 1s) cubic-bezier(.77,0,.58,1) forwards;
+
+                @media (prefers-reduced-motion: reduce) {
+                    animation: none;
+                }
+                
+                --dur: 15s;
+                --delay: calc(1s - 5s);
+
+                & div {
+                    width: auto;
+                    transition: width 6s linear;
+                    transition-delay: 0s;
+
+                    &.speed-1 { filter: url(#blur-1); }
+                    &.speed-2 { filter: url(#blur-2); }
+                    &.speed-3 { filter: url(#blur-3); }
+                    &.speed-4 {
+                        filter: url(#blur-4);
+                        height: 1.2lh;
+                    }
+                    &.speed-5 {
+                        filter: url(#blur-5);
+                        height: 1.5lh;
+                    }
+                }
+            }
+
+            & > div:nth-child(24), & > div:nth-child(25) { transition-timing-function: ease-out; }
+
+            /**
+             * The things I do to avoid JavaScript.
+             */
+            & > div:nth-child(10) { transition-delay: calc(var(--delay) + 0.60979825 * var(--dur) - 500ms); }
+            & > div:nth-child(11) { transition-delay: calc(var(--delay) + 0.67584972 * var(--dur)); }
+            & > div:nth-child(12) { transition-delay: calc(var(--delay) + 0.73645279 * var(--dur)); }
+            & > div:nth-child(13) { transition-delay: calc(var(--delay) + 0.79036875 * var(--dur) - 250ms); }
+            & > div:nth-child(14) { transition-delay: calc(var(--delay) + 0.83656262 * var(--dur)); }
+            & > div:nth-child(15) { transition-delay: calc(var(--delay) + 0.87444002 * var(--dur)); }
+            & > div:nth-child(16) { transition-delay: calc(var(--delay) + 0.90405706 * var(--dur)); }
+            & > div:nth-child(17) { transition-delay: calc(var(--delay) + 0.92621027 * var(--dur)); }
+            & > div:nth-child(18) { transition-delay: calc(var(--delay) + 0.94232810 * var(--dur)); }
+            & > div:nth-child(19) { transition-delay: calc(var(--delay) + 0.95416178 * var(--dur)); }
+            & > div:nth-child(20) { transition-delay: calc(var(--delay) + 0.96338482 * var(--dur)); }
+            & > div:nth-child(21) { transition-delay: calc(var(--delay) + 0.97127664 * var(--dur) - 400ms); }
+            & > div:nth-child(22) { transition-delay: calc(var(--delay) + 0.97861668 * var(--dur)); }
+            & > div:nth-child(23) { transition-delay: calc(var(--delay) + 0.98577679 * var(--dur) - 550ms); }
+            
+            & > div:nth-child(25) { transition-delay: calc(var(--delay) + var(--dur) - 750ms); }
+        }
+    }
+}
+
+.contact-block {
+    margin-block-start: 2.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    position: relative;
+}
+
+.contact-list {
+    display: inline-grid;
+    grid-template-columns: auto 1fr;
+    grid-auto-rows: 1fr;
+    gap: 1em;
+    column-gap: 0.75em;
+
+    & > a {
+        display: grid;
+        grid-column: 1 / 3;
+        grid-template-columns: subgrid;
+        align-items: center;
+        background: white;
+        border-radius: 9999px;
+        color: black !important;
+        border: 2px solid white;
+        padding: 0.5em;
+        padding-inline: 1em;
+        text-decoration: none;
+
+        & .pre-link {
+            color: color-mix(in srgb, black, white 50%);
+        }
+    }
+}
+
+.linkedin-logo {
+    height: 2em;
+    width: 2em;
+    vertical-align: middle;
+}
+
+#projects .scroll-wrapper.back { view-transition-name: projects-top; }
+#projects .scroll-wrapper.forward { view-transition-name: projects-bottom; }
+#industry .scroll-wrapper.back { view-transition-name: industry-top; }
+#industry .scroll-wrapper.forward { view-transition-name: industry-bottom; }
+
+section#projects .content {
+    view-transition-name: projects-content;
+}
+
+section#industry .content {
+    view-transition-name: industry-content;
+}
+
+/** Once again, consider only applying when targeted by hash? */
