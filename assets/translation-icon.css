@@ -39,13 +39,32 @@
 
     .icon-wrapper {
         display: grid;
-        grid-template-rows: 1fr 1fr;
-        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1em 1em;
+        grid-template-columns: 1em 1em;
         aspect-ratio: 1;
+        position: relative;
+
+        --connector-color: color-mix(in hsl, white, black 45%);
+        --connector-width: 0.26ch; /* 0.25ch is just under 2px and rounds down at 100% zoom. */
 
         .crossed &, .noscript-crossed & {
             mask-image: linear-gradient(135deg, black, black calc(50% - 3px), transparent calc(50% - 3px), transparent calc(50% + 3px), black calc(50% + 3px), black);
             mask-size: 100% 100%;
+        }
+
+        &::before {
+            content: '';
+            position: absolute;
+            inset: calc(25% - var(--connector-width));
+            border-radius: 0.25ch;
+            border: var(--connector-width) solid var(--connector-color);
+            
+            mask-image: linear-gradient(90deg, transparent 50%, white 50%), linear-gradient(90deg, white 50%, transparent 50%);
+            mask-origin: border-box;
+            mask-size: 100% 50%, 100% 50%;
+            mask-position: top left, bottom left;
+            mask-repeat: no-repeat;
+            mask-mode: alpha;
         }
 
         @media (scripting: enabled) {
@@ -72,18 +91,6 @@
         /** lol */
         text-box-edge: text alphabetic;
         text-box-trim: trim-both;
-
-        --connector-color: color-mix(in hsl, white, black 45%);
-        --connector-width: 0.26ch; /* 0.25ch is just under 2px and rounds down at 100% zoom. */
-
-        &::after {
-            position: absolute;
-            content: '';
-            width: 100%;
-            height: 100%;
-            border-radius: 0.25ch;
-            z-index: -1;
-        }
     }
 
     .grapheme-latin {
@@ -94,6 +101,8 @@
         inset-block-end: -12.5%;
         inset-inline-end: -12.5%;
 
+        z-index: 1;
+
         /* background: color-mix(in hsl, #1f6feb, black 25%); */
         /* color: color-mix(in hsl, white, black 25%); */
 
@@ -102,13 +111,6 @@
 
         &::before {
             content: 'A' / '';
-        }
-
-        &::after {            
-            inset-inline-start: calc(25% + var(--connector-width));
-            inset-block-start: 25%;
-            border-block-start: var(--connector-width) solid var(--connector-color);
-            border-inline-end: var(--connector-width) solid var(--connector-color);
         }
     }
 
@@ -126,13 +128,6 @@
 
         &::before {
             content: 'あ' / '';
-        }
-
-        &::after {
-            inset-inline-end: calc(25% + var(--connector-width));
-            inset-block-end: 25%;
-            border-block-end: var(--connector-width) solid var(--connector-color);
-            border-inline-start: var(--connector-width) solid var(--connector-color);
         }
     }
 }

@@ -166,3 +166,12 @@ html[data-translated='true']:is(:lang(de), :lang(fr)) .warning-wrapper:not(:has(
     margin-inline-start: 1em;
     place-content: center;
 }
+
+code {
+    white-space: nowrap;
+    line-height: 1rem;
+    border-radius: 0.5rch;
+    border: 1px solid white;
+    background: color-mix(in srgb, white, black 90%);
+    padding: 0.25ch 0.5ch;
+}

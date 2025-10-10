@@ -315,7 +315,7 @@ class LanguagePicker extends HTMLElement {
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.adoptedStyleSheets = [languagePickerStyles];
         this.shadowRoot.innerHTML = `
-            <button id="button" aria-haspopup="menu" popovertarget="menu" aria-labeledby="picker-button-label" aria-describedby="picker-button-description">
+            <button id="button" aria-haspopup="menu" popovertarget="menu" aria-labelledby="picker-button-label" aria-describedby="picker-button-description">
                 <div id="en" class="button-face" aria-hidden="true">
                     <div class="flag language-en"></div>
                     <div class="text-reveal">
